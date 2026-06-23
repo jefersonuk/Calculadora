@@ -4466,6 +4466,15 @@ var solver = (function () {
   .reg-status{font-size:13px;font-family:var(--mono);color:var(--pos)}
   .reg-hint{font-size:12px;color:var(--dim);line-height:1.55;margin-top:12px}
   .reg-hint b{color:var(--ink2)}
+  .ambos-tag{display:inline-block;font-size:10.5px;font-family:var(--mono);
+    background:#2a2418;color:var(--warn);padding:2px 7px;border-radius:6px;
+    margin-left:6px;vertical-align:middle;letter-spacing:.02em}
+  tr.row-ambos td{background:rgba(236,192,74,.05)}
+  .btn-drive{display:inline-flex;align-items:center;gap:8px;margin-top:12px;
+    background:#13251c;border:1px solid #2c5440;color:var(--pos);
+    padding:11px 18px;border-radius:10px;font-size:13.5px;font-weight:600;
+    text-decoration:none;font-family:inherit;transition:.15s}
+  .btn-drive:hover{background:#173024;border-color:var(--pos)}
   .prop-banner b{color:var(--acid);font-weight:680}
   .alt tr.sel td{background:#16231a}
   .alt tr[data-teto]:hover td{background:#141a14}
@@ -4580,8 +4589,10 @@ var solver = (function () {
         </div>
         <div class="reg-actions">
           <button class="btn-go" id="btnCopiar" style="flex:0 0 auto">📋 Copiar linha pra planilha</button>
+          <button class="btn-ghost" id="btnDetalhe" style="flex:0 0 auto;padding:13px 20px">📝 Copiar detalhamento</button>
           <span id="regStatus" class="reg-status"></span>
         </div>
+        <a href="https://docs.google.com/spreadsheets/d/1ZGYtiWancAnIPorMlSx6S72OR0ynQV5s86flh243cQc/edit" target="_blank" rel="noopener" class="btn-drive">📊 Abrir planilha no Drive</a>
         <div class="reg-hint">Preencha os campos, clique em copiar e cole (Cmd+V) na próxima linha vazia da aba <b>Registro</b> da planilha. A coluna <b>Retorno</b> vai em branco — preencha quando o jogo terminar; a planilha calcula lucro, ROI e saldo sozinha.</div>
       </div>
 
@@ -4612,11 +4623,6 @@ const EXEMPLO = [
   {nome:"Casa Final + 2ºT",              cond:["CF","C2"],        odd:0},
   {nome:"Casa Final + Ambas Sim",        cond:["CF","AS"],        odd:0},
   {nome:"Casa Final + Ambas Não",        cond:["CF","AN"],        odd:0},
-  {nome:"Casa Final + 1ºT + Ambas Sim",  cond:["CF","C1","AS"],   odd:0},
-  {nome:"Casa Final + 1ºT + Ambas Não",  cond:["CF","C1","AN"],   odd:0},
-  {nome:"Casa Final + 2ºT + Ambas Sim",  cond:["CF","C2","AS"],   odd:0},
-  {nome:"Casa Final + 2ºT + Ambas Não",  cond:["CF","C2","AN"],   odd:0},
-  {nome:"Casa F + 1ºT + 2ºT + Ambas Não",cond:["CF","C1","C2","AN"],odd:0},
   // ---- EMPATE ----
   {nome:"Empate Final",                  cond:["EF"],             odd:0},
   {nome:"Empate + Ambas Sim",            cond:["EF","AS"],        odd:0},
@@ -4628,11 +4634,6 @@ const EXEMPLO = [
   {nome:"Fora Final + 2ºT",              cond:["FF","F2"],        odd:0},
   {nome:"Fora Final + Ambas Sim",        cond:["FF","AS"],        odd:0},
   {nome:"Fora Final + Ambas Não",        cond:["FF","AN"],        odd:0},
-  {nome:"Fora Final + 1ºT + Ambas Sim",  cond:["FF","F1","AS"],   odd:0},
-  {nome:"Fora Final + 1ºT + Ambas Não",  cond:["FF","F1","AN"],   odd:0},
-  {nome:"Fora Final + 2ºT + Ambas Sim",  cond:["FF","F2","AS"],   odd:0},
-  {nome:"Fora Final + 2ºT + Ambas Não",  cond:["FF","F2","AN"],   odd:0},
-  {nome:"Fora F + 1ºT + 2ºT + Ambas Não",cond:["FF","F1","F2","AN"],odd:0},
 ];
 const COND_LABEL={CF:"Casa",FF:"Fora",EF:"Emp",C1:"C1T",F1:"F1T",E1:"E1T",
   C2:"C2T",F2:"F2T",E2:"E2T",AS:"Ambas✓",AN:"Ambas✗",ZZ:"0-0"};
@@ -4814,15 +4815,20 @@ function recalculaDeStakes(stakes, banca){
     agg[t].w=Math.min(agg[t].w,lucro);agg[t].b=Math.max(agg[t].b,lucro);
   }
   const placares=[
-    [0,0,0,0,"0-0"],[1,0,1,0,"1-0"],[2,0,1,0,"2-0"],[2,0,2,0,"2-0 (2 no 1ºT)"],
-    [3,0,2,0,"3-0"],[1,1,1,0,"1-1"],[2,1,1,0,"2-1"],[2,2,1,1,"2-2"],[3,1,2,0,"3-1"],
-    [0,1,0,1,"0-1"],[0,2,0,1,"0-2"],[0,2,0,2,"0-2 (2 no 1ºT)"],[0,3,1,2,"0-3"],
-    [1,2,0,1,"1-2"],[1,3,1,1,"1-3"]
+    [0,0,0,0,"0-0"],[1,0,1,0,"1-0 (Casa só 1ºT)"],[1,0,0,0,"1-0 (Casa só 2ºT)"],
+    [2,0,1,0,"2-0 (Casa ambos tempos)"],[2,0,2,0,"2-0 (Casa só 1ºT)"],
+    [3,0,2,0,"3-0 (Casa ambos tempos)"],[1,1,1,0,"1-1"],[2,1,1,0,"2-1 (Casa só 1ºT)"],
+    [2,2,1,1,"2-2"],[3,1,2,0,"3-1 (Casa só 1ºT)"],
+    [0,1,0,1,"0-1 (Fora só 1ºT)"],[0,1,0,0,"0-1 (Fora só 2ºT)"],
+    [0,2,0,1,"0-2 (Fora ambos tempos)"],[0,2,0,2,"0-2 (Fora só 1ºT)"],
+    [0,3,0,2,"0-3 (Fora ambos tempos)"],[1,2,1,1,"1-2 (Fora só 2ºT)"],[1,3,0,2,"1-3 (Fora só 1ºT)"]
   ];
   const linhas=placares.map(([ph,pa,hh,ha,lbl])=>{
     const cs=condDoCenario({ph,pa,hh,ha}),pv=payout(cs),t=tipo({ph,pa});
     let ret=0;for(let j=0;j<N;j++)ret+=pv[j]*(stakes[j]||0);
-    return {placar:lbl, tipo:t, retorno:ret, lucro:ret-aplicado};
+    // vence ambos os tempos = ganhou 1ºT (C1/F1) E ganhou 2ºT (C2/F2) do mesmo lado
+    const ambos = (cs.has("C1")&&cs.has("C2")) || (cs.has("F1")&&cs.has("F2"));
+    return {placar:lbl, tipo:t, retorno:ret, lucro:ret-aplicado, ambos};
   });
   return {agg, aplicado, linhas};
 }
@@ -4864,8 +4870,9 @@ function renderResultado(stakes, banca, favorito, oddsFinal, autoInfo, manual){
   // placar a placar
   const lb=document.getElementById('lineBody');lb.innerHTML='';
   calc.linhas.forEach(l=>{
-    lb.innerHTML+=`<tr>
-      <td class="score">${l.placar}</td>
+    const tag2 = l.ambos ? ' <span class="ambos-tag" title="o vencedor ganhou o 1º e o 2º tempo">★ ambos tempos</span>' : '';
+    lb.innerHTML+=`<tr${l.ambos?' class="row-ambos"':''}>
+      <td class="score">${l.placar}${tag2}</td>
       <td><span class="tag ${tipoCls[l.tipo]}">${l.tipo.replace(' vence','')}</span></td>
       <td class="num dim">${money(calc.aplicado)}</td>
       <td class="num">${money(l.retorno)}</td>
@@ -5079,6 +5086,46 @@ document.getElementById('btnCopiar').addEventListener('click',()=>{
   if(navigator.clipboard && navigator.clipboard.writeText){
     navigator.clipboard.writeText(linha).then(sucesso).catch(()=>{fallback();sucesso();});
   }else{ fallback(); sucesso(); }
+});
+
+// ---------- Copiar detalhamento dos bilhetes ----------
+function copiarTexto(texto, onOk){
+  const fb=()=>{const ta=document.createElement('textarea');ta.value=texto;
+    ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);
+    ta.select();try{document.execCommand('copy');}catch(e){}document.body.removeChild(ta);};
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(texto).then(onOk).catch(()=>{fb();onOk();});
+  }else{ fb(); onOk(); }
+}
+
+document.getElementById('btnDetalhe').addEventListener('click',()=>{
+  const st=document.getElementById('regStatus');
+  if(!estado){ st.style.color='var(--neg)'; st.textContent='Calcule uma carteira antes de copiar o detalhamento.'; return; }
+  const jogo=document.getElementById('regJogo').value.trim();
+  const data=document.getElementById('regData').value;
+  const dataBR = data ? data.split('-').reverse().join('/') : '';
+  const calc=recalculaDeStakes(estado.stakes, estado.banca);
+  const linhas=[];
+  bilhetes.forEach((b,i)=>{
+    const ap=estado.stakes[i]||0;
+    if(ap>0.005 && b.odd>1 && b.cond.length>0){
+      linhas.push(`• ${b.nome}  (odd ${b.odd.toFixed(2)})  →  R$ ${brNum(ap)}`);
+    }
+  });
+  if(linhas.length===0){ st.style.color='var(--neg)'; st.textContent='Nenhum bilhete com aporte para detalhar.'; return; }
+  const cab=[];
+  if(jogo)cab.push(jogo);
+  if(dataBR)cab.push(dataBR);
+  const titulo = cab.length? cab.join(' — ')+'\n' : '';
+  const texto = titulo
+    + 'Carteira de cobertura — '+linhas.length+' bilhetes\n'
+    + '--------------------\n'
+    + linhas.join('\n')
+    + '\n--------------------\n'
+    + 'Total apostado: R$ '+brNum(calc.aplicado)
+    + (estado.manual?'  (stakes editados manualmente)':'');
+  copiarTexto(texto, ()=>{ st.style.color='var(--pos)';
+    st.textContent='✓ Detalhamento copiado! Cole onde quiser (notas, grupo, etc).'; });
 });
 
 document.getElementById('addRow').addEventListener('click',()=>{
