@@ -4356,31 +4356,39 @@ var solver = (function () {
 </script>
 <style>
   :root{
-    --bg:#0b0d0c; --panel:#15191700; --panel2:#161b18; --line:#2a322c;
-    --ink:#eef4ef; --ink2:#c4ccc6; --dim:#8b958d; --acid:#c4f74f; --acid-d:#a4d63e;
-    --pos:#6ee089; --pos-bg:#11251600; --neg:#f5746a; --neg-bg:#2a141100; --warn:#ecc04a;
-    --casa:#e0a93a; --casa-bg:#2e2510; --fora:#5dd98a; --fora-bg:#10291c;
-    --emp:#7fa8e0; --emp-bg:#16202f;
+    --bg:#0a0c0b; --panel:#15191700; --panel2:#131815; --panel3:#0f1310; --line:#252d27;
+    --line2:#323b34;
+    --ink:#f1f6f1; --ink2:#c6cec8; --dim:#8b958d; --acid:#caff52; --acid-d:#a4d63e;
+    --pos:#74e890; --pos-bg:#11251600; --neg:#fa7c72; --neg-bg:#2a141100; --warn:#f0c655;
+    --casa:#eab23f; --casa-bg:#2e2510; --fora:#5fe08e; --fora-bg:#0f2a1d;
+    --emp:#84ade8; --emp-bg:#16202f;
     --mono:'SFMono-Regular',ui-monospace,Menlo,Consolas,monospace;
   }
   *{box-sizing:border-box}
   body{
-    margin:0;background:var(--bg);color:var(--ink);
+    margin:0;background:
+      radial-gradient(120% 60% at 50% -10%, #11160f 0%, var(--bg) 55%);
+    background-attachment:fixed;
+    color:var(--ink);
     font-family:'Inter',-apple-system,system-ui,sans-serif;
     line-height:1.55;-webkit-font-smoothing:antialiased;font-size:15px;
   }
-  .wrap{max-width:920px;margin:0 auto;padding:32px 20px 90px}
+  .wrap{max-width:920px;margin:0 auto;padding:30px 18px 110px}
   header{margin-bottom:6px}
-  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.16em;
-    text-transform:uppercase;color:var(--acid-d);margin-bottom:8px}
-  h1{font-size:28px;font-weight:680;margin:0 0 6px;letter-spacing:-.02em}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.18em;
+    text-transform:uppercase;color:var(--acid-d);margin-bottom:9px;
+    display:inline-flex;align-items:center;gap:7px}
+  .eyebrow::before{content:"";width:18px;height:1px;background:var(--acid-d);opacity:.6}
+  h1{font-size:28px;font-weight:680;margin:0 0 6px;letter-spacing:-.025em}
   .sub{color:var(--ink2);font-size:14.5px;margin-bottom:24px;max-width:680px}
   .sub b{color:var(--ink);font-weight:600}
 
   .card{background:var(--panel2);border:1px solid var(--line);
-    border-radius:16px;padding:22px;margin-bottom:18px}
-  .card h2{font-size:12px;font-weight:600;margin:0 0 16px;
-    font-family:var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--dim)}
+    border-radius:16px;padding:22px;margin-bottom:16px}
+  .card h2{font-size:11.5px;font-weight:600;margin:0 0 16px;
+    font-family:var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--dim);
+    display:flex;align-items:center;gap:9px}
+  .card h2::after{content:"";flex:1;height:1px;background:var(--line);opacity:.7}
   .block-title{font-size:13px;font-weight:650;margin:26px 0 12px;
     letter-spacing:.01em;color:var(--ink)}
 
@@ -4421,9 +4429,11 @@ var solver = (function () {
   .toolbar{display:flex;gap:12px;margin:20px 0 0;flex-wrap:wrap}
   button{font-family:inherit;font-size:14.5px;font-weight:650;cursor:pointer;
     border-radius:11px;padding:13px 22px;border:1px solid transparent;transition:.15s}
-  .btn-go{background:var(--acid);color:#0b0d0c;flex:1;min-width:200px}
+  .btn-go{background:var(--acid);color:#0a0c0b;flex:1;min-width:200px;
+    box-shadow:0 1px 0 #ffffff20 inset}
   .btn-go:hover{background:var(--acid-d)}
-  .btn-ghost{background:transparent;border-color:var(--line);color:var(--ink)}
+  .btn-go:active{transform:translateY(1px)}
+  .btn-ghost{background:transparent;border-color:var(--line2);color:var(--ink)}
   .btn-ghost:hover{border-color:var(--dim)}
   button.add{padding:9px 16px;font-size:13px;background:transparent;
     border:1px dashed var(--line);color:var(--dim);margin-top:6px}
@@ -4434,21 +4444,32 @@ var solver = (function () {
 
   .results{display:none}
   .results.show{display:block}
-  .verdict{border-radius:13px;padding:18px 20px;margin-bottom:18px;border:1px solid}
+  .verdict{border-radius:14px;padding:20px 22px;margin-bottom:18px;border:1px solid;
+    position:relative;overflow:hidden}
+  .verdict::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px}
   .verdict.ok{background:#0e1d11;border-color:#2f5234}
+  .verdict.ok::before{background:var(--pos)}
   .verdict.bad{background:#211512;border-color:#523029}
-  .verdict .big{font-size:23px;font-weight:700;letter-spacing:-.01em}
-  .verdict .lbl{font-size:14px;color:var(--ink2);margin-top:5px;line-height:1.5}
+  .verdict.bad::before{background:var(--neg)}
+  .verdict .big{font-size:24px;font-weight:700;letter-spacing:-.02em}
+  .verdict .lbl{font-size:14px;color:var(--ink2);margin-top:6px;line-height:1.5}
 
-  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:8px}
-  .stat{background:#0e1210;border:1px solid var(--line);border-radius:12px;padding:15px 16px}
-  .stat .k{font-size:11px;color:var(--dim);text-transform:uppercase;
-    letter-spacing:.05em;font-family:var(--mono)}
-  .stat .v{font-size:21px;font-weight:700;margin-top:5px;font-family:var(--mono)}
+  .grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:11px;margin-bottom:8px}
+  .stat{background:var(--panel3);border:1px solid var(--line);border-radius:13px;
+    padding:16px 16px 17px;position:relative;overflow:hidden}
+  .stat .k{font-size:10.5px;color:var(--dim);text-transform:uppercase;
+    letter-spacing:.07em;font-family:var(--mono)}
+  .stat .v{font-size:23px;font-weight:700;margin-top:6px;font-family:var(--mono);
+    letter-spacing:-.02em;line-height:1.05;white-space:nowrap}
   .v.pos{color:var(--pos)} .v.neg{color:var(--neg)}
 
   .scen td,.scoreline td{font-family:var(--mono);font-size:14px}
+  th.num,td.num{white-space:nowrap}
   .scoreline td.score{font-weight:680;color:var(--ink);letter-spacing:.02em}
+  .scoreline td:first-child{border-left:3px solid transparent;padding-left:12px}
+  .scoreline tr.row-casa td:first-child{border-left-color:var(--casa)}
+  .scoreline tr.row-emp td:first-child{border-left-color:var(--emp)}
+  .scoreline tr.row-fora td:first-child{border-left-color:var(--fora)}
   td.dim{color:var(--dim)}
   td.bold{font-weight:680}
   .lp{color:var(--pos)} .ln{color:var(--neg)}
@@ -4486,9 +4507,26 @@ var solver = (function () {
   details{margin-top:14px}
   summary{cursor:pointer;font-size:13px;color:var(--acid-d);font-family:var(--mono);
     padding:4px 0}
-  @media(max-width:600px){.grid3{grid-template-columns:1fr}
+  @media(max-width:600px){
+    .wrap{padding:24px 14px 100px}
+    h1{font-size:24px}
+    .grid3{grid-template-columns:1fr;gap:9px}
+    .stat{display:flex;align-items:baseline;justify-content:space-between;padding:13px 15px}
+    .stat .v{margin-top:0}
     td.cond,th.cond{display:none}
-    .scoreline th:nth-child(3),.scoreline td:nth-child(3){display:none}}
+    .scoreline th:nth-child(3),.scoreline td:nth-child(3){display:none}
+    input[type=text],input[type=number],select{font-size:16px;padding:12px 13px}
+    td .odd-in,td .aporte-in{font-size:16px}
+    .scen td,.scoreline td,.scen th,.scoreline th{font-size:12.5px;padding:8px 7px}
+    .scoreline td:first-child{padding-left:10px}
+    .verdict .big{font-size:21px}
+    .toolbar{position:sticky;bottom:0;z-index:30;margin:20px -14px 0;
+      padding:12px 14px calc(12px + env(safe-area-inset-bottom));
+      background:linear-gradient(180deg,#0a0c0b00,var(--bg) 24%);
+      border-top:1px solid var(--line)}
+    .btn-go{padding:15px 22px}
+  }
+  @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
 <body>
@@ -4526,6 +4564,8 @@ var solver = (function () {
         <select id="modo" style="width:100%;background:#0d110f;border:1px solid var(--line);color:var(--ink);border-radius:10px;padding:11px 13px;font-size:14px;font-family:var(--mono)">
           <option value="cobertura" selected>Cobertura — lucro parelho em todos os cenários</option>
           <option value="ev">Resultado esperado — concentra no mais provável (favorito)</option>
+          <option value="ultra">Ultra retorno — empate e zebra (favorito = seguro)</option>
+          <option value="comissao">Priorizar comissão — concentra em combinadas (2+ pernas = 4%)</option>
         </select>
       </div>
     </div>
@@ -4628,6 +4668,10 @@ const EXEMPLO = [
   {nome:"Empate + Ambas Sim",            cond:["EF","AS"],        odd:0},
   {nome:"Empate + Ambas Não",            cond:["EF","AN"],        odd:0},
   {nome:"Placar 0-0",                    cond:["ZZ"],             odd:0},
+  // ---- DUPLA CHANCE (cobre dois resultados; OR, não AND) ----
+  {nome:"Dupla chance 1X (Casa ou Empate)", cond:["DC_1X"],       odd:0},
+  {nome:"Dupla chance X2 (Empate ou Fora)", cond:["DC_X2"],       odd:0},
+  {nome:"Dupla chance 12 (Casa ou Fora)",   cond:["DC_12"],       odd:0},
   // ---- LADO FORA (visitante vence / a zebra) ----
   {nome:"Fora Final",                    cond:["FF"],             odd:0},
   {nome:"Fora Final + 1ºT",              cond:["FF","F1"],        odd:0},
@@ -4636,7 +4680,8 @@ const EXEMPLO = [
   {nome:"Fora Final + Ambas Não",        cond:["FF","AN"],        odd:0},
 ];
 const COND_LABEL={CF:"Casa",FF:"Fora",EF:"Emp",C1:"C1T",F1:"F1T",E1:"E1T",
-  C2:"C2T",F2:"F2T",E2:"E2T",AS:"Ambas✓",AN:"Ambas✗",ZZ:"0-0"};
+  C2:"C2T",F2:"F2T",E2:"E2T",AS:"Ambas✓",AN:"Ambas✗",ZZ:"0-0",
+  DC_1X:"1X",DC_X2:"X2",DC_12:"12"};
 
 let bilhetes = JSON.parse(JSON.stringify(EXEMPLO));
 
@@ -4655,6 +4700,10 @@ function condDoCenario(c){
   s.add(sh>sa?"C2":sh<sa?"F2":"E2");
   s.add(ph>0&&pa>0?"AS":"AN");
   if(ph===0&&pa===0)s.add("ZZ");
+  // dupla chance: marca os pares que incluem o resultado deste cenário
+  if(ph>pa){s.add("DC_1X");s.add("DC_12");}        // Casa: 1X e 12
+  else if(ph<pa){s.add("DC_X2");s.add("DC_12");}   // Fora: X2 e 12
+  else{s.add("DC_1X");s.add("DC_X2");}             // Empate: 1X e X2
   return s;
 }
 function tipo(c){return c.ph>c.pa?"Casa vence":c.ph<c.pa?"Fora vence":"Empate";}
@@ -4698,7 +4747,47 @@ function resolver(banca,tetoPct,modo){
       model.variables["s"+j]["off"+j]=1;
     }
   }
-  if(modo==='ev'){
+  if(modo==='comissao'){
+    // MODO PRIORIZAR COMISSÃO: a casa paga 2% no bilhete simples (1 perna) e
+    // 4% na múltipla (2+ pernas). Maximiza a comissão total = sum(stake * taxa),
+    // MANTENDO a cobertura intacta (não-favoritos lucro >= banca; favorito perda <= teto).
+    // Naturalmente empurra volume para os bilhetes de 2+ pernas (taxa dobrada).
+    for(let j=0;j<N;j++){
+      const taxa = bilhetes[j].cond.length>=2 ? 0.04 : 0.02;
+      model.variables["s"+j].goal = taxa;
+    }
+    cen.forEach((c,idx)=>{
+      const cs=condDoCenario(c), pv=payout(cs), t=tipo(c), cn="c"+idx;
+      if(t===favorito){
+        model.constraints[cn]={min:banca-teto};
+        for(let j=0;j<N;j++)if(pv[j])model.variables["s"+j][cn]=pv[j];
+        model.variables["L"][cn]=1;
+      }else{
+        model.constraints[cn]={min:banca};
+        for(let j=0;j<N;j++)if(pv[j])model.variables["s"+j][cn]=pv[j];
+      }
+    });
+  }else if(modo==='ultra'){
+    // MODO ULTRA RETORNO: lucro concentrado em EMPATE e ZEBRA (lados não-favoritos).
+    // Favorito = SEGURO: seu resultado só precisa devolver a banca (piso 0), nunca dá lucro.
+    // Maximiza o MENOR lucro entre os lados não-favoritos (maximin) -> retorno alto nos dois.
+    model.variables["M"]={goal:1};   // menor lucro entre empate e zebra, a maximizar
+    model.variables["L"].goal=0;     // perda no favorito fora do objetivo (já limitada por tetoL)
+    cen.forEach((c,idx)=>{
+      const cs=condDoCenario(c), pv=payout(cs), t=tipo(c), cn="c"+idx;
+      if(t===favorito){
+        // seguro: retorno do favorito >= banca - teto (piso ~0, folga = teto)
+        model.constraints[cn]={min:banca-teto};
+        for(let j=0;j<N;j++)if(pv[j])model.variables["s"+j][cn]=pv[j];
+        model.variables["L"][cn]=1;
+      }else{
+        // empate/zebra: sum(pv*s) - banca >= M  ->  sum(pv*s) - M >= banca
+        model.constraints[cn]={min:banca};
+        for(let j=0;j<N;j++)if(pv[j])model.variables["s"+j][cn]=pv[j];
+        model.variables["M"][cn]=-1;
+      }
+    });
+  }else if(modo==='ev'){
     // MODO RESULTADO ESPERADO: maximiza soma ponderada de lucro por probabilidade.
     // peso de cada cenário = probabilidade do lado / nº de cenários daquele lado.
     // mantém o teto de perda no favorito como restrição.
@@ -4733,6 +4822,18 @@ function resolver(banca,tetoPct,modo){
   const res=solver.Solve(model);
   if(!res.feasible)return{status:'inviavel'};
   const s=[];for(let j=0;j<N;j++)s[j]=res["s"+j]||0;
+  // arredonda aportes para números redondos (sem centavos), respeitando a banca total.
+  for(let j=0;j<N;j++){ s[j]=s[j]>0.005?Math.round(s[j]):0; }
+  let _soma=s.reduce((a,v)=>a+v,0), _exc=Math.round(_soma-banca);
+  if(_exc>0){
+    const idx=s.map((v,j)=>j).filter(j=>s[j]>0).sort((a,b)=>s[b]-s[a]);
+    let k=0,guard=0;
+    while(_exc>0 && idx.length && guard<100000){
+      const j=idx[k%idx.length];
+      if(s[j]>1){s[j]-=1;_exc-=1;}
+      k++;guard++;
+    }
+  }
   const agg={"Casa vence":{w:1e9,b:-1e9},"Empate":{w:1e9,b:-1e9},"Fora vence":{w:1e9,b:-1e9}};
   for(const c of cen){
     const cs=condDoCenario(c),pv=payout(cs),t=tipo(c);
@@ -4762,7 +4863,10 @@ function resolver(banca,tetoPct,modo){
     let ret=0;for(let j=0;j<N;j++)ret+=pv[j]*s[j];
     return {placar:lbl, tipo:t, retorno:ret, lucro:ret-aplicado};
   });
-  return{status:'ok',s,agg,aplicado,linhas,favorito,modo,evTotal,probLado,oddsFinal:{Casa:oddCasa,Empate:oddEmp,Fora:oddFora}};
+  // comissão da casa: 2% por bilhete simples, 4% por múltipla (2+ pernas)
+  let comissao=0;
+  for(let j=0;j<N;j++){ if(s[j]>0.005){ comissao += s[j]*(bilhetes[j].cond.length>=2?0.04:0.02); } }
+  return{status:'ok',s,agg,aplicado,linhas,favorito,modo,evTotal,probLado,comissao,oddsFinal:{Casa:oddCasa,Empate:oddEmp,Fora:oddFora}};
 }
 
 // ---------- Render ----------
@@ -4771,6 +4875,7 @@ function condTags(cond){
     let cls='emp';
     if(['CF','C1','C2'].includes(c))cls='casa';
     else if(['FF','F1','F2'].includes(c))cls='fora';
+    else if(['DC_1X','DC_X2','DC_12'].includes(c))cls='emp';
     return `<span class="tag ${cls}">${COND_LABEL[c]||c}</span>`;
   }).join(' ');
 }
@@ -4830,7 +4935,9 @@ function recalculaDeStakes(stakes, banca){
     const ambos = (cs.has("C1")&&cs.has("C2")) || (cs.has("F1")&&cs.has("F2"));
     return {placar:lbl, tipo:t, retorno:ret, lucro:ret-aplicado, ambos};
   });
-  return {agg, aplicado, linhas};
+  let comissao=0;
+  for(let j=0;j<N;j++){ if((stakes[j]||0)>0.005){ comissao += (stakes[j]||0)*(bilhetes[j].cond.length>=2?0.04:0.02); } }
+  return {agg, aplicado, linhas, comissao};
 }
 
 // re-renderiza apenas stats + tabelas (usado tanto pelo solver quanto pela edição manual)
@@ -4854,10 +4961,12 @@ function renderResultado(stakes, banca, favorito, oddsFinal, autoInfo, manual){
       ? 'Todo placar fica ≥ 0 — lucro mínimo de '+money(Math.max(0,lucroMin))+', inclusive na vitória do favorito.'
       : 'Pior caso no favorito: '+money(piorFav)+' ('+Math.abs(piorFavPct).toFixed(1)+'% da banca aplicada). Outros cenários: pelo menos '+money(lucroMin)+'.'}</div>`;
   // stats
+  const comPct = calc.aplicado>0 ? (calc.comissao/calc.aplicado*100) : 0;
   document.getElementById('stats').innerHTML=`
     <div class="stat"><div class="k">Banca aplicada</div><div class="v">${money(calc.aplicado)}</div></div>
     <div class="stat"><div class="k">Pior caso (favorito: ${favNome})</div><div class="v ${piorFav<-0.01?'neg':'pos'}">${money(piorFav)}</div></div>
-    <div class="stat"><div class="k">Lucro mín. (outros)</div><div class="v ${lucroMin<-0.01?'neg':'pos'}">${money(lucroMin)}</div></div>`;
+    <div class="stat"><div class="k">Lucro mín. (outros)</div><div class="v ${lucroMin<-0.01?'neg':'pos'}">${money(lucroMin)}</div></div>
+    <div class="stat"><div class="k">Comissão da casa (${comPct.toFixed(2)}%)</div><div class="v pos">${money(calc.comissao)}</div></div>`;
   // faixas
   const sb=document.getElementById('scenBody');sb.innerHTML='';
   ["Casa vence","Empate","Fora vence"].forEach(t=>{
@@ -4871,7 +4980,7 @@ function renderResultado(stakes, banca, favorito, oddsFinal, autoInfo, manual){
   const lb=document.getElementById('lineBody');lb.innerHTML='';
   calc.linhas.forEach(l=>{
     const tag2 = l.ambos ? ' <span class="ambos-tag" title="o vencedor ganhou o 1º e o 2º tempo">★ ambos tempos</span>' : '';
-    lb.innerHTML+=`<tr${l.ambos?' class="row-ambos"':''}>
+    lb.innerHTML+=`<tr class="row-${tipoCls[l.tipo]}${l.ambos?' row-ambos':''}">
       <td class="score">${l.placar}${tag2}</td>
       <td><span class="tag ${tipoCls[l.tipo]}">${l.tipo.replace(' vence','')}</span></td>
       <td class="num dim">${money(calc.aplicado)}</td>
@@ -5047,7 +5156,10 @@ document.addEventListener('click',e=>{
 // ---------- Copiar linha pronta pra planilha ----------
 function tipoCarteiraTexto(){
   const sel=document.getElementById('modo');
-  const base = sel && sel.value==='ev' ? 'Cobertura (EV)' : 'Cobertura';
+  const base = sel && sel.value==='ev' ? 'Cobertura (EV)'
+    : sel && sel.value==='ultra' ? 'Ultra retorno'
+    : sel && sel.value==='comissao' ? 'Comissão (combinadas)'
+    : 'Cobertura';
   const ativos=bilhetes.filter(b=>b.odd>1&&b.cond.length>0).length;
   return base+' · '+ativos+' bilhetes';
 }
